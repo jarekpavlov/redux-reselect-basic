@@ -1,25 +1,52 @@
-import logo from './logo.svg';
-import './App.css';
+import {Component} from "react";
+import {connect} from "react-redux";
+import {filterSelector, userSelector} from "./selectors";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+
+    handleUser = (e) => {
+        this.props.dispatch({type: "CHANGE_USERNAME", payload: e.target.value})
+    }
+    addUser = () => {
+        this.props.dispatch({type: "ADD_USER"})
+    }
+    handleSearch = (e) => {
+        this.props.dispatch({type: "CHANGE_SEARCH", payload: e.target.value})
+    }
+    render() {
+        console.log("rendered users", this.props.filteredUsers);
+        return (
+            <div className="App">
+                <input
+                    type="text"
+                    value={this.props.username}
+                    onChange={this.handleUser}
+                />
+                <button onClick={this.addUser}>Add user</button>
+                <input
+                    type="text"
+                    placeholder="Search"
+                    value={this.props.search}
+                    onChange={this.handleSearch}
+                />
+                {this.props.users.map((user, index) => (
+                    <div key={index}>{user}</div>
+                ))}
+            </div>
+        );
+    }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+    console.log("state", state);
+
+    return {
+        //users: state.users.users,
+        users: userSelector(state),
+        username: state.users.username,
+        search: state.users.search,
+        filteredUsers: filterSelector(state)
+    }
+}
+
+export default connect(mapStateToProps)(App);
